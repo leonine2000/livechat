@@ -1,0 +1,40 @@
+Modules to Develop
+
+Livechat
+	- Start live chat
+	- Notify user of a livechat session (push notification, whatsapp and email)
+	- Store Chat Sessions
+		
+Course Management
+	- View Course Outline
+	- Upload Video into video server
+	- Store Video Link in database
+	- Watch Video
+	- Attach video to course writeup
+	- Track Course Progress
+	
+User Management
+	- Login
+	- Signup
+	- Add, Delete and Update User
+	- Subscription management
+	- One time Signup management
+
+Search Module 
+	- Query Database fast and efficiently
+	- Display result proficiently 
+	
+Payment
+	- Accept payment from multiple vendor
+	- Store and track payment information
+	- Subscription payments
+	
+Referal System
+	- Referal signup link
+	- Payout management 
+	- Multi-level payout management 
+
+
+	
+	
+

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Chat Modal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #liveChatButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #liveChatButton:hover {
+      background-color: #0056b3;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+
+    .modal-content {
+      position: absolute;
+      bottom: 0;
+      right: 20px;
+      background-color: white;
+      margin: 0;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+      transition: transform 0.3s ease-out;
+      transform: translateY(100%);
+    }
+
+    .modal-content.show {
+      transform: translateY(0);
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      overflow-y: auto;
+      max-height: 200px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    #chatInput {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    #sendButton {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #sendButton:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <!-- Live Chat Button -->
+  <button id="liveChatButton">Live Chat</button>
+
+  <!-- Modal -->
+  <div id="chatModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Live Chat</h2>
+      <div class="chat-container">
+        <div class="chat-box">
+          <!-- Chat messages will go here -->
+        </div>
+        <input type="text" id="chatInput" placeholder="Type a message...">
+        <button id="sendButton">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var modal = document.getElementById("chatModal");
+      var btn = document.getElementById("liveChatButton");
+      var span = document.getElementsByClassName("close")[0];
+      var modalContent = document.querySelector(".modal-content");
+      var sendButton = document.getElementById("sendButton");
+      var chatInput = document.getElementById("chatInput");
+      var chatBox = document.getElementsByClassName("chat-box")[0];
+
+      // Function to handle HTTP requests
+      async function request(url, method = 'GET', body = null) {
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        try {
+          const response = await fetch(url, {
+            method,
+            headers,
+            body: body ? JSON.stringify(body) : null
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+
+      // Open the modal
+      btn.onclick = function() {
+        modal.style.display = "block";
+        setTimeout(function() {
+          modalContent.classList.add("show");
+        }, 10); // Add slight delay for animation
+      }
+
+      // Close the modal
+      span.onclick = function() {
+        modalContent.classList.remove("show");
+        setTimeout(function() {
+          modal.style.display = "none";
+        }, 300); // Delay matches the transition time in CSS
+      }
+
+      // Close the modal if the user clicks outside of it
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modalContent.classList.remove("show");
+          setTimeout(function() {
+            modal.style.display = "none";
+          }, 300); // Delay matches the transition time in CSS
+        }
+      }
+
+      // Send message
+      sendButton.addEventListener("click", function() {
+        var message = chatInput.value;
+        if (message) {
+          var messageElement = document.createElement("div");
+          messageElement.textContent = message;
+          chatBox.appendChild(messageElement);
+          chatInput.value = "";
+          chatBox.scrollTop = chatBox.scrollHeight;
+          
+          // Send message to server
+          sendMessage(message);
+        }
+      });
+
+      // Send message on Enter key press
+      chatInput.addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+          sendButton.click();
+        }
+      });
+
+      // Send a message to the server
+      async function sendMessage(message) {
+        const data = {
+          session_id: selectedChatId,
+          sender: 'User', // Adjust as necessary for the sender's identity
+          message: message
+        };
+
+        try {
+          const result = await request('app.php?action=saveMessage', 'POST', data);
+          console.log(result); // Debugging: Check the response from the server
+          if (!result || !result.success) {
+            alert('Failed to send the message.');
+          }
+        } catch (error) {
+          console.error('Error sending message:', error);
+          alert('An error occurred. Please try again.');
+        }
+      }
+    });
+  </script>
+</body>
+</html>

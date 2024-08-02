@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Sessions</title>
+  <style>
+  body {
+  font-family: Arial, sans-serif;
+}
+
+#chatSessions {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.chat-session {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.chat-session:last-child {
+  border-bottom: none;
+}
+
+.chat-session.active {
+  background-color: #f0f8ff;
+}
+
+.chat-session.closed {
+  background-color: #f8f8f8;
+}
+
+#responsePanel {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+#selectedChat {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+#responseInput {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#sendResponseButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#sendResponseButton:hover {
+  background-color: #0056b3;
+}
+
+</style>
+</head>
+<body>
+  <h1>Chat Sessions</h1>
+  <div id="chatSessions"></div>
+  <div id="responsePanel">
+    <h2>Respond to Chat</h2>
+    <div id="selectedChat"></div>
+    <textarea id="responseInput" placeholder="Type your response..."></textarea>
+    <button id="sendResponseButton">Send Response</button>
+  </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+  // Sample chat data
+  const chatData = [
+    {
+      id: 1,
+      status: "active",
+      messages: [
+        { sender: "User", text: "Hello!" },
+        { sender: "Agent", text: "Hi! How can I assist you today?" }
+      ]
+    },
+    {
+      id: 2,
+      status: "closed",
+      messages: [
+        { sender: "User", text: "I need help with my account." },
+        { sender: "Agent", text: "Sure, I'll assist you." },
+        { sender: "User", text: "Thanks, problem solved." }
+      ]
+    }
+  ];
+
+  const chatSessionsContainer = document.getElementById("chatSessions");
+  const selectedChatContainer = document.getElementById("selectedChat");
+  const responseInput = document.getElementById("responseInput");
+  const sendResponseButton = document.getElementById("sendResponseButton");
+  let selectedChatId = null;
+
+  // Function to render chat sessions
+  function renderChatSessions() {
+    chatSessionsContainer.innerHTML = "";
+    chatData.forEach((chat) => {
+      const chatDiv = document.createElement("div");
+      chatDiv.classList.add("chat-session");
+      chatDiv.classList.add(chat.status);
+      chatDiv.dataset.chatId = chat.id;
+      chatDiv.innerHTML = `
+        <h3>Session ID: ${chat.id}</h3>
+        <p>Status: ${chat.status.charAt(0).toUpperCase() + chat.status.slice(1)}</p>
+      `;
+      chatDiv.addEventListener("click", () => selectChat(chat.id));
+      chatSessionsContainer.appendChild(chatDiv);
+    });
+  }
+
+  // Function to select a chat session
+  function selectChat(chatId) {
+    selectedChatId = chatId;
+    const chat = chatData.find((c) => c.id === chatId);
+    selectedChatContainer.innerHTML = chat.messages
+      .map((msg) => `<p><strong>${msg.sender}:</strong> ${msg.text}</p>`)
+      .join("");
+  }
+
+  // Function to send a response
+  function sendResponse() {
+    if (selectedChatId === null) {
+      alert("Please select a chat session first.");
+      return;
+    }
+    const responseText = responseInput.value.trim();
+    if (responseText === "") {
+      alert("Response cannot be empty.");
+      return;
+    }
+
+    // Find the chat session and add the response
+    const chat = chatData.find((c) => c.id === selectedChatId);
+    chat.messages.push({ sender: "Agent", text: responseText });
+
+    // Clear the input field
+    responseInput.value = "";
+
+    // Re-render the selected chat
+    selectChat(selectedChatId);
+  }
+
+  // Initialize the chat sessions and set up event listeners
+  renderChatSessions();
+  sendResponseButton.addEventListener("click", sendResponse);
+});
+</script>
+</body>
+</html>
