@@ -1,5 +1,9 @@
 <?php
-require 'db.php';
+require_once('config/class/autoload.php');
+
+$databse = new Database;
+$conn = $databse->connect();
+
 
 $action = $_GET['action'] ?? '';
 
@@ -28,9 +32,9 @@ switch ($action) {
 }
 
 function saveChatMessage($sessionId, $sender, $message) {
-    global $pdo;
+    global $conn;
     try {
-        $stmt = $pdo->prepare("INSERT INTO chat_messages (session_id, sender, message) VALUES (?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO chat_messages (session_id, sender, message) VALUES (?, ?, ?)");
         $stmt->execute([$sessionId, $sender, $message]);
         return ['success' => true];
     } catch (Exception $e) {
@@ -39,21 +43,21 @@ function saveChatMessage($sessionId, $sender, $message) {
 }
 
 function getChatSessions() {
-    global $pdo;
+    global $conn;
     try {
-        $stmt = $pdo->query("SELECT id, status FROM chat_sessions ORDER BY id DESC");
-        return $stmt->fetchAll();
+        $stmt = $conn->prepare("SELECT id, status FROM chat_sessions ORDER BY id DESC");
+        return $stmt->get_result();
     } catch (Exception $e) {
         return ['success' => false, 'error' => $e->getMessage()];
     }
 }
 
 function getChatMessages($session_id) {
-    global $pdo;
+    global $conn;
     try {
-        $stmt = $pdo->prepare("SELECT sender, message FROM chat_messages WHERE session_id = ?");
+        $stmt = $conn->prepare("SELECT sender, message FROM chat_messages WHERE session_id = ?");
         $stmt->execute([$session_id]);
-        return ['messages' => $stmt->fetchAll()];
+        return ['messages' => $stmt->get_result()];
     } catch (Exception $e) {
         return ['success' => false, 'error' => $e->getMessage()];
     }
