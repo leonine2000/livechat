@@ -26,6 +26,7 @@ function sanitize_input($data)
     return $data;
 }
 
+
 function sanitize_get_variable($variable_name)
 {
     if (isset($_GET[$variable_name])) {

@@ -10,6 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Chat Modal</title>
   <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -19,20 +20,10 @@
 
   <!-- Modal -->
   <div id="chatModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Live Chat</h2>
-      <div class="chat-container">
-        <div class="chat-box">
-          <!-- Chat messages will go here -->
-        </div>
-        <input type="text" id="chatInput" placeholder="Type a message..." />
-        <button id="sendButton">Send</button>
-      </div>
-    </div>
+
   </div>
 
-  <script src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
 </body>
 
 </html>
