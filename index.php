@@ -1,5 +1,9 @@
 <?php
-
+require_once('config/connect.php');
+echo($_SESSION['conversation_id']);
+if (isset($_SESSION['conversation_id'])) {
+  echo($_SESSION['conversation_id']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -14,9 +18,19 @@
 </head>
 
 <body>
+  <div class="dummy-body">
+
+  </div>
 
   <!-- Live Chat Button -->
-  <button id="liveChatButton">Live Chat</button>
+  <button id="liveChatButton"><span class="startchat">
+      <ul>
+        <li>
+          <span class="icon">💬</span>
+          <span class="title">Start Chat</span>
+        </li>
+      </ul>
+    </span></button>
 
   <!-- Modal -->
   <div id="chatModal" class="modal">

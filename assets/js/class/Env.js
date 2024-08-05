@@ -15,7 +15,7 @@ export default class Env {
                 type: apiID
             },
             success: function (data) {
-                console.log(data);
+                
                 if (data.hasOwnProperty("key")) {
                     resolve(data.key); // Resolve the promise with the key
                 } else if (data.hasOwnProperty("error")) {
@@ -36,7 +36,7 @@ export default class Env {
 
 // Usage
     async fetchApiKey(type) {
-    console.log(type)
+    
     try {
         const apiKey = await this.getEnv(type);
         return (apiKey);

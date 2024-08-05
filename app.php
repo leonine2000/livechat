@@ -31,6 +31,22 @@ if (isset($_POST['action']) && $_SERVER['REQUEST_METHOD'] === "POST" && $_POST['
     exit;
 }
 
+if (isset($_POST['action']) && $_SERVER['REQUEST_METHOD'] === "POST" && $_POST['action'] === "sendmessage") {
+    $action = sanitizeStringX($_POST['action']);
+    $text = sanitizeStringX($_POST['text']);
+    $chat = new Chat();
+ 
+    $messageSent = $chat->sendMessage();
+  
+    if ($messageSent['message_sent']) {
+        echo json_encode(array($text,$messageSent['message']));
+        exit;
+    }
+}
+
+
+
+
 
 
 if (isset($_POST['getenv']) && $_POST['getenv'] === 'getenv' && $_SERVER['REQUEST_METHOD'] === "POST") {
@@ -123,5 +139,3 @@ function getChatMessages($session_id)
         return ['success' => false, 'error' => $e->getMessage()];
     }
 }
-
-?>

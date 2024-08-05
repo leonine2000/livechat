@@ -99,18 +99,19 @@ import enviromentVariable from "./class/Env.js";
 $(document).ready(function () {
   const getEnvironmentVariable = new enviromentVariable();
 
-
   ///////////////////////////////////////////Loader Function///////////////////////////////////////////////////////
   function startLoader(element) {
-    
-    let html = '<span class="loader"></span>"';
-    $(element).append(html);
+    let html = '<span class="loader"></span>';
+    $(element).html(html);
+  }
 
-
+  function stopLoader(element, defaultElement) {
+    let html = defaultElement;
+    $(element).html(html);
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//startLoader($("#liveChatButton"));
+  //startLoader($("#liveChatButton"));
 
   //////////////////////////////////handles starting up of the chat////////////////////////////////////////////////////
   $("#liveChatButton").on("click", async function () {
@@ -118,6 +119,7 @@ $(document).ready(function () {
     const actionUrl = await getEnvironmentVariable.fetchApiKey("ACTION_URL");
     const chatModal = $("#chatModal");
     const modalContent = $(".modal-content");
+
     $.ajax({
       url: actionUrl,
       method: "POST",
@@ -126,13 +128,13 @@ $(document).ready(function () {
         action: action,
       },
       success(data) {
-        console.log(data.data);
         if (data.status_code === 200) {
-          chatModal.show();
           chatModal.html(data.data);
+          chatModal.show();
           setTimeout(function () {
-            modalContent.toggleClass("show");
+            $(".modal-content").toggleClass("show");
           }, 10); // Add slight delay for animation
+          bindSendMessageEvent();
         } else {
           alert("problem starting chat");
         }
@@ -142,5 +144,53 @@ $(document).ready(function () {
       },
     });
   });
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  /////////////////////////////////////////////////////Send Message//////////////////////////////////////////////////////////
+
+  function bindSendMessageEvent() {
+    $(".sendmessage").off("click").on("click", SendMessage);
+  }
+
+  async function SendMessage() {
+    const button = $(this);
+    const action = await getEnvironmentVariable.fetchApiKey("SENDMESSAGE");
+    const actionUrl = await getEnvironmentVariable.fetchApiKey("ACTION_URL");
+    const inputField = $("#inputfield");
+    if (inputField.val() === "") {
+      inputField.toggleClass("empty-field", true);
+      return;
+    }
+    startLoader(this);
+    inputField.prop("disabled", true);
+    button.prop("disabled", true);
+    $.ajax({
+      method: "POST",
+      url: actionUrl,
+      dataType: "JSON",
+      data: {
+        action: action,
+        text: inputField.val(),
+      },
+      success(data) {
+        console.log(data[0]);
+        let messageElement = $("<div class='sender'></div>").html(data[0]); // Create a new div element and set its HTML content using jQuery
+        $(".chat-box").append(messageElement); // Append the new element to the .chat-box using jQuery
+
+        stopLoader(".sendmessage", "Send");
+        inputField.prop("disabled", false);
+        button.prop("disabled", false);
+        inputField.val("");
+      },
+      error(e) {
+        stopLoader(".sendmessage", "Send");
+        inputField.prop("disabled", false);
+        button.prop("disabled", false);
+        console.log(e);
+      },
+    });
+  }
+
+  window.SendMessage = SendMessage;
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 });
