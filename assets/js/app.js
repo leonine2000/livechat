@@ -97,7 +97,7 @@ import enviromentVariable from "./class/Env.js";
  */
 
 $(document).ready(function () {
-  const getEnvironmentVariable = new enviromentVariable();
+  const getEnvironmentVariable = new enviromentVariable(); //ENV class for retrieving environment variables
 
   ///////////////////////////////////////////Loader Function///////////////////////////////////////////////////////
   function startLoader(element) {
@@ -109,7 +109,44 @@ $(document).ready(function () {
     let html = defaultElement;
     $(element).html(html);
   }
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////Handles closing of the Modal ////////////////////////////////////////////////
+  function closeModal() {
+    $(".modal-content").removeClass("show");
+    setTimeout(function () {
+      $("#chatModal").hide();
+    }, 300); // Delay matches the transition time in CSS
+  }
+
+  // Close the modal if the user clicks outside of it
+  $(window).click(function (event) {
+    if ($(event.target).is("#chatModal")) {
+      $(".modal-content").removeClass("show");
+      setTimeout(function () {
+        $("#chatModal").hide();
+      }, 300); // Delay matches the transition time in CSS
+    }
+  });
+
+  //////////////////////////////////////////////Scroll To animated/////////////////////////////////////////////////
+  // Scroll to an element with the given selector
+  function scrollToElement(selector) {
+    // Use jQuery to select the element
+    var $element = $(selector);
+
+    // Check if the element exists
+    if ($element.length) {
+      // Animate the scroll to the element
+      $("html, body").animate(
+        {
+          scrollTop: $element.offset().top,
+        },
+        1000
+      ); // Duration of the scroll in milliseconds
+    } else {
+      console.log("element doesnt exist");
+    }
+  }
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   //startLoader($("#liveChatButton"));
 
@@ -135,6 +172,10 @@ $(document).ready(function () {
             $(".modal-content").toggleClass("show");
           }, 10); // Add slight delay for animation
           bindSendMessageEvent();
+          fetchMessages();
+          setTimeout(function () {
+            scrollToElement(".chat-box .sender:last-child");
+          }, 100);
         } else {
           alert("problem starting chat");
         }
@@ -150,6 +191,7 @@ $(document).ready(function () {
 
   function bindSendMessageEvent() {
     $(".sendmessage").off("click").on("click", SendMessage);
+    $(".close").off("click").on("click", closeModal);
   }
 
   async function SendMessage() {
@@ -173,7 +215,7 @@ $(document).ready(function () {
         text: inputField.val(),
       },
       success(data) {
-        console.log(data[0]);
+        console.log(data);
         let messageElement = $("<div class='sender'></div>").html(data[0]); // Create a new div element and set its HTML content using jQuery
         $(".chat-box").append(messageElement); // Append the new element to the .chat-box using jQuery
 
@@ -192,5 +234,42 @@ $(document).ready(function () {
   }
 
   window.SendMessage = SendMessage;
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  /////////////////////////////////////////////////Fetching Messages////////////////////////////////////////////////////////
+  async function fetchMessages() {
+    console.log("fetching.............");
+    const actionUrl = await getEnvironmentVariable.fetchApiKey("ACTION_URL");
+    const action = await getEnvironmentVariable.fetchApiKey("GET_CONVERSATION");
+
+    $.ajax({
+      url: actionUrl,
+      method: "GET",
+      dataType: "JSON",
+      data: { action: action },
+      success(data) {
+        let response = data.response;
+        let chatBox = $(".chat-box");
+        chatBox.empty(); // Clear existing messages
+
+        if (response.code === 200) {
+          const messages = response.data;
+          messages.forEach((singleMessage) => {
+            let messageElement =
+              '<div class="sender">' + singleMessage.message_text + "</div>";
+            chatBox.append(messageElement);
+          });
+
+          //scrollToElement(".chat-box .sender:last-child");
+        } else {
+          console.log("Failed to fetch messages");
+        }
+      },
+      error(e) {
+        console.log("error ", e);
+      },
+    });
+  }
+
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 });

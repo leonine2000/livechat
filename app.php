@@ -35,17 +35,32 @@ if (isset($_POST['action']) && $_SERVER['REQUEST_METHOD'] === "POST" && $_POST['
     $action = sanitizeStringX($_POST['action']);
     $text = sanitizeStringX($_POST['text']);
     $chat = new Chat();
- 
-    $messageSent = $chat->sendMessage();
-  
+
+    $messageSent = $chat->sendMessage($text);
+
     if ($messageSent['message_sent']) {
-        echo json_encode(array($text,$messageSent['message']));
+        echo json_encode(array($text, $messageSent['message']));
         exit;
     }
 }
 
 
+if (isset($_GET['action']) && $_SERVER['REQUEST_METHOD'] === "GET" && $_GET['action'] === "retrieveMsgWithID") {
 
+    $conversation_id = isset($_GET['conversation_id']) ? sanitizeString($_GET['conversation_id'])     : (isset($_SESSION['conversation_id']) && !empty($_SESSION['conversation_id'])
+        ? $_SESSION['conversation_id']
+        : '');
+
+    $chat = new Chat();
+    $messages = $chat->retrieveMessagesWithID($conversation_id);
+    $response = array(
+
+        "response" => $messages
+    );
+
+    echo json_encode($response);
+    exit;
+}
 
 
 
@@ -105,7 +120,7 @@ switch ($action) {
         break;
 }
  */
-function saveChatMessage($sessionId, $sender, $message)
+/* function saveChatMessage($sessionId, $sender, $message)
 {
     global $conn;
     try {
@@ -138,4 +153,4 @@ function getChatMessages($session_id)
     } catch (Exception $e) {
         return ['success' => false, 'error' => $e->getMessage()];
     }
-}
+} */

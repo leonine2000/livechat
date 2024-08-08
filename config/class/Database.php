@@ -201,7 +201,83 @@ class Database
         }
     }
 
+    public function selectMultiColsWithJoin($conn, $table, $cols, $values, $joinTables = [], $joinConditions = [], $addons = "")
+    {
+        // Ensure the columns and values are arrays and have the same length
+        if (is_array($cols) && is_array($values) && count($cols) === count($values)) {
+            // Start building the query
+            $query = "SELECT * FROM $table";
 
+            // Add JOIN clauses if provided
+            if (!empty($joinTables) && !empty($joinConditions)) {
+                foreach ($joinTables as $index => $joinTable) {
+                    $condition = isset($joinConditions[$index]) ? $joinConditions[$index] : '';
+                    $query .= " JOIN $joinTable ON $condition";
+                }
+            }
+
+            // Add WHERE conditions
+            $query .= " WHERE ";
+            $conditions = [];
+            foreach ($cols as $col) {
+                $conditions[] = "$col = ?";
+            }
+            // Join all conditions with 'AND'
+            $query .= implode(' AND ', $conditions) . " " . $addons;
+
+            // Prepare the statement
+            $stmt = $conn->prepare($query);
+
+            // Create the types string for bind_param
+            $types = "";
+            foreach ($values as $item) {
+                $types .= variableType($item)['sym'];
+            }
+
+            // Use call_user_func_array to bind parameters dynamically
+            $stmt->bind_param($types, ...$values);
+
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+                if ($result->num_rows > 0) {
+                    $data = [];
+                    while ($row = $result->fetch_assoc()) {
+                        $data[] = $row;
+                    }
+                    return [
+                        "code" => 200,
+                        "data" => $data,
+                        "total" => count($data)
+                    ];
+                } else {
+                    // Returned no results
+                    return [
+                        "code" => 404,
+                        "data" => [],
+                        "total" => 0
+                    ];
+                }
+            } else {
+                // Query failed - Internal error
+                return [
+                    "code" => 500,
+                    "data" => [],
+                    "total" => 0
+                ];
+            }
+
+            $stmt->close();
+            $conn->close();
+        } else {
+            // Invalid input
+            return [
+                "code" => 400,
+                "data" => [],
+                "total" => 0,
+                "message" => "Columns and values must be arrays of the same length."
+            ];
+        }
+    }
 
     function insert($conn, $tableName, $fields, $values)
     {

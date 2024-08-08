@@ -5,16 +5,24 @@
 
 body {
   font-family: Arial, sans-serif;
+  background: url("../images/profile/render.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+@media (max-width: 800px) {
+  body {
+    background: url("../images/profile/render-mob.jpg");
+  }
 }
 
 .overflow-scroll::-webkit-scrollbar {
   width: 0.3em;
 }
 
- .overflow-scroll::-webkit-scrollbar-track {
+.overflow-scroll::-webkit-scrollbar-track {
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
 }
- 
 
 .overflow-scroll::-webkit-scrollbar-thumb {
   background-color: grey;
@@ -159,7 +167,7 @@ body {
   outline: 0;
   width: 300px;
   border-radius: 10px;
-  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s ease-out;
   transform: translateY(100%);
 }
@@ -169,11 +177,23 @@ body {
 }
 
 .close {
-  color: #aaa;
+  color: #000;
   float: right;
-  font-size: 28px;
+  font-size: 20px;
   font-weight: bold;
   cursor: pointer;
+  position: absolute;
+  height: 25px;
+  background: #98e0f7;
+  width: 25px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  right: 2px;
+  border-top-right-radius: 8px;
+  outline: 2px solid #98e0f7;
+  top: 2px;
 }
 
 .close:hover,
@@ -187,15 +207,13 @@ body {
 }
 
 .chat-box {
-  flex-grow: 1;
-  overflow-y: auto;
   max-height: 200px;
-border: 0;
+  border: 0;
   border-radius: 5px;
   margin-bottom: 10px;
   display: flex;
-    flex-direction: column;
-    gap: 10px;
+  flex-direction: column;
+  gap: 10px;
 }
 
 #chatInput {
@@ -253,16 +271,16 @@ border: 0;
   align-items: stretch;
 }
 .chat-box .sender {
-    border: 0;
-    padding: 10px;
-    background: var(--j);
-    color: #fff;
-    border-radius: 1px;
+  border: 0;
+  padding: 10px;
+  background: var(--j);
+  color: #fff;
+  border-radius: 1px;
 }
 
 .chat-header {
   padding: 10px;
-  background-color: rgba(84,204,242,0.6);
+  background-color: rgba(84, 204, 242, 0.6);
   display: flex;
   align-items: center;
   justify-content: space-evenly;
@@ -320,12 +338,12 @@ border: 0;
   padding: 5px 10px;
   border: none;
   background: linear-gradient(45deg, var(--i), var(--j));
-  border-top-right-radius:10px;
-  border-bottom-right-radius:10px;
-  
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+
   color: #fff;
   font-weight: bold;
-  
+
   cursor: pointer;
   transition: background-color 0.3s;
 }
@@ -360,12 +378,13 @@ border: 0;
   animation-delay: 0.3s;
 }
 
-.agent_profile img{
+.agent_profile img {
   width: 2rem;
   height: 2rem;
+  object-fit: cover;
+  object-position: top;
   padding: 5px;
   border-radius: 100%;
   background: #fff;
   outline: 0.5px solid rgba(0, 0, 0, 0.2);
-
 }
